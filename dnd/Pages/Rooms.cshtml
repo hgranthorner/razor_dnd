@@ -1,0 +1,40 @@
+@page "{id}"
+@model dnd.Pages.Rooms
+
+<h1>@Model.Room.Name</h1>
+@if (Model.InCombat)
+{
+    <button class="btn btn-danger">End Combat</button>
+}
+else
+{
+    <button class="btn btn-info">Begin Combat</button>
+}
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Character</th>
+        <th scope="col">Player</th>
+        <th scope="col">Dex</th>
+        <th scope="col">Initiative</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var character in @Model.Room.Characters)
+    {
+        <tr>
+            <td>@character.Name</td>
+            <td>@character.User.Name</td>
+            <td>@character.Dex</td>
+            <td>@if (Model.InCombat)
+                {
+                    <span>@Model.RollInitiative(character)</span>
+                }
+                else
+                {
+                    <span></span>
+                }</td>
+        </tr>
+    }
+    </tbody>
+</table>

@@ -1,0 +1,15 @@
+@page
+@model dnd.Pages.RoomListModel
+@{
+    ViewData["Title"] = "Rooms";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>A list of available rooms.</p>
+<ul>
+    @foreach (var room in Model.Rooms)
+    {
+        <li><a asp-page="/Rooms" asp-route-id="@room.Id">@room.Name</a></li>     
+    }
+</ul>
