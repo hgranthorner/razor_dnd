@@ -12,6 +12,8 @@ namespace dnd.Data.Models
 
         [Required] 
         public int Dex { get; set; } = 0;
+        public int Initiative { get; set; }
+        public int TurnNumber { get; set; } = 0;
         [Required]
         public int UserId { get; set; }
         [Required]

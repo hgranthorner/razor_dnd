@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using dnd.BusinessLogic;
 using dnd.Data;
 using dnd.Data.Models;
@@ -11,30 +12,39 @@ namespace dnd.Pages
     public class Rooms : PageModel
     {
         private readonly DnDContext _context;
-        public Room Room;
-        public bool InCombat;
         
         public Rooms(DnDContext context)
         {
             _context = context;
         }
-
-        public void OnGet(string id)
+        public async Task OnPostToggle(int id, bool inCombat)
         {
-            Room = _context.Rooms
+            var newCombatStatus = !inCombat;
+            (await _context.Rooms.FindAsync(id)).InCombat = newCombatStatus;
+            var characters = _context.Characters.Where(c => c.RoomId == id);
+            if (!newCombatStatus)
+                await characters.ForEachAsync(c =>
+                {
+                    c.Initiative = 0;
+                    c.TurnNumber = 0;
+                });
+            else
+                await characters.ForEachAsync(c => c.Initiative = DiceRoller.RollD20(c.Dex));
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task OnPostTurnTaken(int roomId, int characterId)
+        {
+            (await _context.Characters.FindAsync(characterId)).TurnNumber++;
+            await _context.SaveChangesAsync();
+        }
+        
+        public Room GetRoom(string id)
+        {
+            return _context.Rooms
                 .Include(r => r.Characters)
                 .ThenInclude(c => c.User)
                 .First(room => room.Id == Convert.ToInt32(id));
-        }
-
-        public int RollInitiative(Character character)
-        {
-            return DiceRoller.RollD20(character.Dex);
-        }
-
-        public void ToggleCombat()
-        {
-            InCombat = !InCombat;
         }
     }
 }

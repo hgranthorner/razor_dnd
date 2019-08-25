@@ -1,15 +1,22 @@
 @page "{id}"
 @model dnd.Pages.Rooms
-
-<h1>@Model.Room.Name</h1>
-@if (Model.InCombat)
-{
-    <button class="btn btn-danger">End Combat</button>
+@{
+    var id = RouteData.Values["id"].ToString();
+    var room = Model.GetRoom(id);
 }
-else
-{
-    <button class="btn btn-info">Begin Combat</button>
-}
+<h1>@room.Name</h1>
+<form method="post" asp-page-handler="toggle"
+      asp-route-id="@RouteData.Values["id"]"
+      asp-route-inCombat="@room.InCombat">
+    @if (room.InCombat)
+    {
+        <button class="btn btn-danger">End Combat</button>
+    }
+    else
+    {
+        <button class="btn btn-success">Begin Combat</button>
+    }
+</form>
 <table class="table">
     <thead>
     <tr>
@@ -17,23 +24,24 @@ else
         <th scope="col">Player</th>
         <th scope="col">Dex</th>
         <th scope="col">Initiative</th>
+        <th scope="col"/>
     </tr>
     </thead>
     <tbody>
-    @foreach (var character in @Model.Room.Characters)
+    @foreach (var character in @room.Characters.OrderBy(c => c.TurnNumber).ThenByDescending(c => c.Initiative))
     {
         <tr>
             <td>@character.Name</td>
             <td>@character.User.Name</td>
             <td>@character.Dex</td>
-            <td>@if (Model.InCombat)
-                {
-                    <span>@Model.RollInitiative(character)</span>
-                }
-                else
-                {
-                    <span></span>
-                }</td>
+            <td>@character.Initiative</td>
+            <td>
+                <form method="post" asp-page-handler="turnTaken"
+                      asp-route-roomId="@room.Id"
+                      asp-route-characterId="@character.Id">
+                    <button class="btn btn-sm btn-info">✔</button>
+                </form>
+            </td>
         </tr>
     }
     </tbody>
