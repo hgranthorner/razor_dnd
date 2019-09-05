@@ -2,3 +2,9 @@
 @model dnd.Pages.Login
 
 <h1>Login</h1>
+
+<form method="post" asp-page-handler="login">
+    <input type="text" name="name">
+    <input type="password" name="password">
+    <button type="submit">LOGIN</button>
+</form>

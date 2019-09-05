@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using dnd.Data.Models;
 using dnd.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,13 @@ namespace dnd.Pages
 
         public void OnGet()
         {
-            _session.SetString(SessionKeys.UserName, "Gil");
+            var user = new User
+            {
+                Id = 1,
+                Name = "Gil",
+                Password = "gillovespoo"
+            };
+            _session.SetObject(SessionKeys.User, user);
         }
     }
 }
